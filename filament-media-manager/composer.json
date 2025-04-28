@@ -1,16 +1,7 @@
 {
-    "name": "tomatophp/filament-media-manager",
+    "name": "tobil476/filament-media-manager-custom",
     "type": "library",
-    "description": "Manage your media files using spatie media library with easy to use GUI for FilamentPHP",
-    "keywords": [
-        "php",
-        "laravel",
-        "filament",
-        "media",
-        "manager",
-        "spatie",
-        "media-library"
-    ],
+    "description": "Custom Filament Media Manager for my project",
     "license": "MIT",
     "autoload": {
         "psr-4": {
@@ -29,12 +20,6 @@
             ]
         }
     },
-    "authors": [
-        {
-            "name": "Fady Mondy",
-            "email": "info@3x1.io"
-        }
-    ],
     "require": {
         "php": "^8.1|^8.2",
         "tomatophp/console-helpers": "^1.1",
