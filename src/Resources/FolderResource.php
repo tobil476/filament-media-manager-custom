@@ -197,7 +197,7 @@ class FolderResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->check() && auth()->user()->role === 'admin';
+        return false;//auth()->check() && auth()->user()->role === 'admin';
     }
 
     public static function canEdit(Model $record): bool
