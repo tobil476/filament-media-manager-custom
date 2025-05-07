@@ -6,10 +6,55 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 class Folder extends Model implements HasMedia
 {
     use InteractsWithMedia;
+    
+    // relazione ai figli immediati
+    public function children()
+    {
+        return $this->hasMany(self::class, 'model_id')
+                    ->where('model_type', self::class);
+    }
+
+    /** Tutte le discendenti (inclusa la cartella corrente) */
+    public function descendantsAndSelf(): EloquentCollection
+    {
+        // inizi con te stesso
+        $all = new EloquentCollection([$this]);
+
+        // prendi i figli immediati
+        $children = static::where('model_id', $this->id)
+                        ->where('model_type', self::class)
+                        ->get();
+
+        // ricorsione
+        foreach ($children as $child) {
+            $all = $all->merge($child->descendantsAndSelf());
+        }
+
+        return $all;
+    }
+    public function parentFolder()
+    {
+        return $this->belongsTo(
+            self::class,
+            'model_id'
+        )//->where('model_type', self::class);
+        ;
+    }
+
+    /** Tutti i media presenti nella cartella e in tutte le sue sottocartelle */
+    public function allMedia(): EloquentCollection
+    {
+        return new EloquentCollection(
+            $this->descendantsAndSelf()
+                ->flatMap(fn ($folder) => $folder->media)
+                ->unique('id')
+                ->values()
+        );
+    }
 
     protected $fillable = [
         'parent_id',

@@ -49,9 +49,22 @@
                             @endif
                         </div>
                         <div>
-                            <div class="flex flex-col justify-between border-t dark:border-gray-700 p-4">
-                                <div>
-                                    <h1 class="font-bold break-words">{{ $item->hasCustomProperty('title') ? (!empty($item->getCustomProperty('title')) ? $item->getCustomProperty('title') : $item->name) : $item->name }}</h1>
+                            <div class="border-t dark:border-gray-700 pt-2">
+                                <div class="flex items-center justify-between">
+                                    <h1 class="font-bold text-sm break-words">
+                                        {{ $item->hasCustomProperty('title')
+                                            ? (!empty($item->getCustomProperty('title'))
+                                                ? $item->getCustomProperty('title')
+                                                : $item->name)
+                                            : $item->name
+                                        }}
+                                    </h1>
+                                    <a href="{{ route('secure.media', $item) }}"
+                                       download
+                                       onclick="event.stopPropagation()"
+                                       class="text-blue-600 hover:text-blue-800">
+                                        <x-icon name="heroicon-o-arrow-down-tray" class="w-6 h-6" />
+                                    </a>
                                 </div>
 
                                 @if($item->hasCustomProperty('description') && !empty($item->getCustomProperty('description')))
