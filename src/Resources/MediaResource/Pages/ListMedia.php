@@ -92,20 +92,35 @@ class ListMedia extends ManageRecords
             }
             // nessun padre ⇒ siamo in un sotto-folder di ordine/azienda
             else {
-                // torni alla lista dei folder dell’azienda / ordine
-                $actions[] = Actions\Action::make('back')
-                    ->icon('heroicon-o-arrow-left')
-                    ->color('gray')
-                    ->url(
-                        route(
-                            'filament.'.filament()->getCurrentPanel()->getId().'.resources.folders.index',
-                            array_filter([
-                                'tenant'     => filament()->getTenant()?->getRouteKey(),
-                                'model_type' => Folder::class,
-                                'collection' => $folder->collection,
-                            ])
-                        )
-                    );
+                if (is_null($folder->model_id)) {
+                    $actions[] = Actions\Action::make('back')
+                        ->icon('heroicon-o-arrow-left')
+                        ->color('gray')
+                        ->url(
+                            route(
+                                'filament.' . filament()->getCurrentPanel()->getId() . '.resources.folders.index',
+                                [
+                                    'tenant' => filament()->getTenant()?->getRouteKey(),
+                                ]
+                            )
+                        );
+                }
+                //   b-2) è la radice di un ordine (ha collection / model_type) → lista ordini
+                else {
+                    $actions[] = Actions\Action::make('back')
+                        ->icon('heroicon-o-arrow-left')
+                        ->color('gray')
+                        ->url(
+                            route(
+                                'filament.' . filament()->getCurrentPanel()->getId() . '.resources.folders.index',
+                                [
+                                    'tenant'     => filament()->getTenant()?->getRouteKey(),
+                                    'model_type' => Folder::class,
+                                    'collection' => $folder->collection,
+                                ]
+                            )
+                        );
+                }
             }
         }
 
