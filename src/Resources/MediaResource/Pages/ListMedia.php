@@ -82,7 +82,11 @@ class ListMedia extends ManageRecords
                     ->url(
                         route(
                             'filament.'.filament()->getCurrentPanel()->getId().'.resources.media.index',
-                            ['folder_id' => $parent->id]
+                            array_filter([
+                                // ← tenant solo se il panel è multi-tenant
+                                'tenant'   => filament()->getTenant()?->getRouteKey(),
+                                'folder_id'=> $parent->id,
+                            ])
                         )
                     );
             }
@@ -95,10 +99,11 @@ class ListMedia extends ManageRecords
                     ->url(
                         route(
                             'filament.'.filament()->getCurrentPanel()->getId().'.resources.folders.index',
-                            [
+                            array_filter([
+                                'tenant'     => filament()->getTenant()?->getRouteKey(),
                                 'model_type' => Folder::class,
                                 'collection' => $folder->collection,
-                            ]
+                            ])
                         )
                     );
             }
