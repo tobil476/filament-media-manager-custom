@@ -62,34 +62,72 @@ class ListMedia extends ManageRecords
         session()->put('folder_id', $this->folder_id);
     }
 
+    //aggiunto tasto conn freccai "indietro"
     protected function getHeaderActions(): array
     {
         $folder_id = $this->folder_id;
+        $folder    = Folder::find($folder_id);
 
-        $folder = config('filament-media-manager.model.folder')::find($folder_id);
+        /* ---------------- FRECCIA INDIETRO ---------------- */
+        $actions = [];
 
+        if ($folder) {
 
-        if(filament('filament-media-manager')->allowUserAccess && (!empty($folder->user_id))){
-            if($folder->user_id === auth()->user()->id && $folder->user_type === get_class(auth()->user())){
-                return [
+            // 1 livello di padre?
+            if ($parent = $folder->parentFolder) {
+                // torni alla cartella padre (al suo contenuto media)
+                $actions[] = Actions\Action::make('back')
+                    ->icon('heroicon-o-arrow-left')
+                    ->color('gray')
+                    ->url(
+                        route(
+                            'filament.'.filament()->getCurrentPanel()->getId().'.resources.media.index',
+                            ['folder_id' => $parent->id]
+                        )
+                    );
+            }
+            // nessun padre ⇒ siamo in un sotto-folder di ordine/azienda
+            else {
+                // torni alla lista dei folder dell’azienda / ordine
+                $actions[] = Actions\Action::make('back')
+                    ->icon('heroicon-o-arrow-left')
+                    ->color('gray')
+                    ->url(
+                        route(
+                            'filament.'.filament()->getCurrentPanel()->getId().'.resources.folders.index',
+                            [
+                                'model_type' => Folder::class,
+                                'collection' => $folder->collection,
+                            ]
+                        )
+                    );
+            }
+        }
+
+        /* ---------- pulsanti standard già esistenti ---------- */
+        if (filament('filament-media-manager')->allowUserAccess
+            && (! empty($folder->user_id))) {
+
+            if ($folder->user_id === auth()->id()
+                && $folder->user_type === get_class(auth()->user())) {
+
+                $actions = array_merge($actions, [
                     CreateMediaAction::make($folder_id),
                     CreateSubFolderAction::make($folder_id),
                     DeleteFolderAction::make($folder_id),
                     EditCurrentFolderAction::make($folder_id),
-                ];
+                ]);
             }
-            else {
-                return [];
-            }
-        }
-        else {
-            return [
+        } else {
+            $actions = array_merge($actions, [
                 CreateMediaAction::make($folder_id),
                 CreateSubFolderAction::make($folder_id),
                 DeleteFolderAction::make($folder_id),
                 EditCurrentFolderAction::make($folder_id),
-            ];
+            ]);
         }
+
+        return $actions;
     }
 
     public function folderAction(?Folder $item=null){
